@@ -31,6 +31,8 @@ import (
 	"github.com/hillu/go-yara/v4"
 )
 
+const YaraScanTimeoutSeconds = 60
+
 // This is a persistent object sent to scanners for scanning files.
 var yaraRules *yara.Rules
 
@@ -52,6 +54,8 @@ type Scanner struct {
 func unzipRules(zipPath string, extractionPath string) error {
 	logger.Info().Str("zip", zipPath).Str("dest", extractionPath).Msg("starting rule extraction")
 
+	var openedFiles int
+
 	r, err := zip.OpenReader(zipPath)
 	if err != nil {
 		return fmt.Errorf("failed to open zip file %s: %w", zipPath, err)
@@ -68,8 +72,9 @@ func unzipRules(zipPath string, extractionPath string) error {
 		fpath := filepath.Join(extractionPath, f.Name)
 
 		// Security check: Prevent Path Traversal (crucial for untrusted zip files)
-		if !strings.HasPrefix(fpath, filepath.Clean(extractionPath)+string(os.PathSeparator)) {
-			logger.Warn().Str("filename", f.Name).Msg("Skipping file due to path traversal risk")
+		relPath, err := filepath.Rel(extractionPath, fpath)
+		if err != nil || strings.HasPrefix(relPath, "..") {
+			logger.Warn().Str("filename", f.Name).Msg("skipping file due to path traversal risk")
 			continue
 		}
 
@@ -101,24 +106,26 @@ func unzipRules(zipPath string, extractionPath string) error {
 		// Close handles immediately after use
 		rc.Close()
 		outFile.Close()
-
+		openedFiles++
 		if err != nil {
 			return fmt.Errorf("failed to copy content for %s: %w", fpath, err)
 		}
 	}
-	logger.Info().Msg("rule extraction complete.")
+	logger.Info().Int("rule_files", openedFiles).Msg("rule extraction complete.")
 	return nil
 }
 
 // Compiles all yara rules specified inside a target directory.
 func compileRules(rulesDir string) (*yara.Rules, error) {
+	var rulesAdded int
+	var rulesSkipped int
+
 	// Start a new compiler.
 	compiler, err := yara.NewCompiler()
 	if err != nil {
 		return nil, fmt.Errorf("could not create YARA compiler: %w", err)
 	}
-	var rulesAdded int
-	var rulesSkipped int
+	defer compiler.Destroy()
 
 	// Parse all files and
 	if err = filepath.WalkDir(rulesDir, func(path string, d fs.DirEntry, err error) error {
@@ -133,24 +140,23 @@ func compileRules(rulesDir string) (*yara.Rules, error) {
 		if strings.HasSuffix(d.Name(), ".yar") || strings.HasSuffix(d.Name(), ".yara") {
 			logger.Debug().Str("rule_file", path).Msg("adding rule to compiler")
 
+			// Read the rule content.
 			content, readErr := os.ReadFile(path)
 			if readErr != nil {
 				logger.Error().Err(readErr).Str("rule_file", path).Msg("could not read rule file content")
 				rulesSkipped++
-				return nil // Continue walking
+				return nil
 			}
 
-			// 2. Create a temporary compiler for syntax checking (the "dummy compiler")
+			// Create a temp compiler for syntax checking
 			checkCompiler, checkErr := yara.NewCompiler()
 			if checkErr != nil {
-				// This is a critical error, stop the process
 				return fmt.Errorf("could not create temporary YARA compiler for checking: %w", checkErr)
 			}
-
+			defer checkCompiler.Destroy()
 			ruleContent := string(content)
 
-			// 3. Attempt to compile the rule using the temporary compiler.
-			// This check will poison the temporary compiler if the syntax is bad.
+			// Attempt to compile the rule into temp compiler
 			if addErr := checkCompiler.AddString(ruleContent, path); addErr != nil {
 				logger.Error().Err(addErr).Str("rule_file", path).Msg("syntax error in rule file. skipping")
 				rulesSkipped++
@@ -158,9 +164,8 @@ func compileRules(rulesDir string) (*yara.Rules, error) {
 				return nil
 			}
 
-			// 4. If the temporary check passed, add the rules to the main compiler.
+			// If temp compiler passed then add rule to main compiler.
 			if finalAddErr := compiler.AddString(ruleContent, path); finalAddErr != nil {
-				// This indicates a more serious issue (e.g., memory exhaustion, internal YARA error)
 				return fmt.Errorf("unexpected error adding pre-checked rule to main compiler %s: %w", path, finalAddErr)
 			}
 
@@ -172,11 +177,13 @@ func compileRules(rulesDir string) (*yara.Rules, error) {
 		return nil, err
 	}
 
+	// Get compiled rules from compiler.
 	rules, err := compiler.GetRules()
 	if err != nil {
 		return nil, fmt.Errorf("could not get compiled rules after adding files: %w", err)
 	}
 
+	logger.Info().Int("rule_added", rulesAdded).Int("rules_skipped", rulesSkipped).Msg("compiled rules")
 	return rules, nil
 }
 
@@ -187,22 +194,66 @@ func saveScanResults(results []YaraScanResult) error {
 		return nil
 	}
 
-	// Generate a unique filename based on the current time
-	timestamp := time.Now().Format("20060102_150405")
-	outputFile := filepath.Join(GlobalConfig.Paths.WorkDirectory, fmt.Sprintf("results_%s.json", timestamp))
+	// Ensure database connection is available
+	if err := getDBConnection(); err != nil {
+		return fmt.Errorf("failed to get database connection: %w", err)
+	}
+	scanTime := time.Now().Unix()
 
-	// Marshals the results struct into pretty-printed JSON
-	data, err := json.MarshalIndent(results, "", "  ")
+	// Begin a transaction
+	tx, err := DB.Begin()
 	if err != nil {
-		return fmt.Errorf("failed to marshal scan results to JSON: %w", err)
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	// Build the bulk insert query with placeholders
+	valueStrings := make([]string, 0, len(results))
+	valueArgs := make([]interface{}, 0, len(results)*3)
+	skippedCount := 0
+
+	for _, result := range results {
+		// Marshal the yara matches to JSON for storage in BLOB
+		yaraResultsJSON, err := json.Marshal(result.Matches)
+		if err != nil {
+			logger.Error().Err(err).Str("filepath", result.FilePath).Msg("failed to marshal yara results, skipping")
+			skippedCount++
+			continue
+		}
+		valueStrings = append(valueStrings, "(?, ?, ?)")
+		valueArgs = append(valueArgs, scanTime, result.FilePath, yaraResultsJSON)
 	}
 
-	// Write the JSON data to a file
-	if err := os.WriteFile(outputFile, data, 0644); err != nil {
-		return fmt.Errorf("failed to write results file %s: %w", outputFile, err)
+	// No valid results to upload.
+	if len(valueStrings) == 0 {
+		logger.Warn().Msg("no valid results to insert after marshaling")
+		return nil
 	}
 
-	logger.Info().Str("filename", outputFile).Msg("scan results saved successfully")
+	// Construct the full query
+	query := fmt.Sprintf(
+		"INSERT INTO scan_results (lastscan_time, filepath, yara_results) VALUES %s",
+		strings.Join(valueStrings, ","),
+	)
+
+	// Execute the bulk insert
+	_, err = tx.Exec(query, valueArgs...)
+	if err != nil {
+		return fmt.Errorf("failed to execute bulk insert: %w", err)
+	}
+
+	// Commit the transaction
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	logger.Info().
+		Int("total_results", len(results)).
+		Int("inserted", len(valueStrings)).
+		Int("skipped", skippedCount).
+		Int64("scan_time", scanTime).
+		Msg("scan results saved to database successfully")
+
 	return nil
 }
 
@@ -215,7 +266,7 @@ func startScan() {
 	}
 
 	// Fetch all files inside the directory and scan them one by one.
-	filepath.WalkDir(GlobalConfig.Paths.ScanTargetDirectory, func(path string, d fs.DirEntry, err error) error {
+	if err := filepath.WalkDir(GlobalConfig.Paths.ScanTargetDirectory, func(path string, d fs.DirEntry, err error) error {
 		// Check if path is accessible.
 		if err != nil {
 			logger.Error().Err(err).Str("path", path).Msg("error accessing path")
@@ -226,7 +277,7 @@ func startScan() {
 		if !d.IsDir() {
 			// Scan the file.
 			var matches yara.MatchRules
-			err := yaraRules.ScanFile(path, 0, 60, &matches)
+			err := scanner.compiledRules.ScanFile(path, 0, YaraScanTimeoutSeconds, &matches)
 
 			scanner.resultsMutex.Lock()
 			// Store the results.
@@ -238,7 +289,9 @@ func startScan() {
 			scanner.resultsMutex.Unlock()
 		}
 		return nil
-	})
+	}); err != nil {
+		logger.Error().Err(err).Msg("failed to parse target directory")
+	}
 
 	// Save results to a file.
 	saveScanResults(scanner.scanResults)

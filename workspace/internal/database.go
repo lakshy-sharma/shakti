@@ -40,6 +40,11 @@ func setupDB() {
 		logger.Fatal().Err(err).Msg("failed to ping database")
 	}
 
+	// Load connection
+	if err := getDBConnection(); err != nil {
+		logger.Error().Err(err).Msg("failed to load database connection")
+	}
+
 	logger.Info().Msg("database is ready")
 }
 
@@ -52,6 +57,7 @@ func createTables() {
 	createTableSQL := `
 	CREATE TABLE IF NOT EXISTS scan_results (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		lastscan_time INTEGER NOT NULL,
 		filepath TEXT NOT NULL,
 		yara_results BLOB
 	);`

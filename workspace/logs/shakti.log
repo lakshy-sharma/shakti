@@ -1705,3 +1705,10 @@
 {"level":"info","time":1760373870997,"message":"rule extraction complete."}
 {"level":"error","error":"undefined identifier \"undefined\"","rule_file":"/tmp/shakti/rules/yes.yar","time":1760373873992,"message":"syntax error in rule file. skipping"}
 {"level":"info","operation_mode":"instant_scan","scan_target":"/home/lakshy/","time":1760373874131,"message":"locked and loaded ready to go!"}
+{"level":"info","file_logging":true,"json_output":true,"log_directory":"./logs","filename":"shakti.log","max_size_mb":50,"max_backups":5,"max_age_days":1,"time":1760375930590,"message":"logging configured"}
+{"level":"info","time":1760375930606,"message":"database is ready"}
+{"level":"info","zip":"../rules.zip","dest":"/tmp/shakti/rules","time":1760375930606,"message":"starting rule extraction"}
+{"level":"info","rule_files":415,"time":1760375930725,"message":"rule extraction complete."}
+{"level":"error","error":"undefined identifier \"undefined\"","rule_file":"/tmp/shakti/rules/yes.yar","time":1760375931215,"message":"syntax error in rule file. skipping"}
+{"level":"info","rule_added":414,"rules_skipped":1,"time":1760375931379,"message":"compiled rules"}
+{"level":"info","operation_mode":"instant_scan","scan_target":"/home/lakshy/","time":1760375931393,"message":"locked and loaded ready to go!"}
