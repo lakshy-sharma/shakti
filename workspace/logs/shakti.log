@@ -1680,3 +1680,28 @@
 {"level":"error","error":"undefined identifier \"undefined\"","rule_file":"/tmp/shakti/rules/yes.yar","time":1760288873513,"message":"syntax error in rule file. skipping"}
 {"level":"info","operation_mode":"instant_scan","target_directory":"/home/lakshy/","time":1760288873564,"message":"locked and loaded ready to go!"}
 {"level":"info","filename":"output/results_20251012_224307.json","time":1760289189040,"message":"scan results saved successfully"}
+{"level":"info","file_logging":true,"json_output":true,"log_directory":"./logs","filename":"shakti.log","max_size_mb":50,"max_backups":5,"max_age_days":1,"time":1760372578648,"message":"logging configured"}
+{"level":"info","zip":"../rules.zip","dest":"/tmp/shakti/rules","time":1760372578648,"message":"starting rule extraction"}
+{"level":"info","time":1760372578744,"message":"rule extraction complete."}
+{"level":"error","error":"undefined identifier \"undefined\"","rule_file":"/tmp/shakti/rules/yes.yar","time":1760372581736,"message":"syntax error in rule file. skipping"}
+{"level":"info","operation_mode":"instant_scan","scan_target":"/home/lakshy/","time":1760372581905,"message":"locked and loaded ready to go!"}
+{"level":"info","file_logging":true,"json_output":true,"log_directory":"./logs","filename":"shakti.log","max_size_mb":50,"max_backups":5,"max_age_days":1,"time":1760372615611,"message":"logging configured"}
+{"level":"fatal","error":"near \")\": syntax error","time":1760372615613,"message":"failed to create tables in our database"}
+{"level":"info","file_logging":true,"json_output":true,"log_directory":"./logs","filename":"shakti.log","max_size_mb":50,"max_backups":5,"max_age_days":1,"time":1760373060874,"message":"logging configured"}
+{"level":"fatal","error":"near \")\": syntax error","time":1760373060876,"message":"failed to create tables in our database"}
+{"level":"info","file_logging":true,"json_output":true,"log_directory":"./logs","filename":"shakti.log","max_size_mb":50,"max_backups":5,"max_age_days":1,"time":1760373080886,"message":"logging configured"}
+{"level":"fatal","error":"near \")\": syntax error","time":1760373080888,"message":"failed to create tables in our database"}
+{"level":"info","file_logging":true,"json_output":true,"log_directory":"./logs","filename":"shakti.log","max_size_mb":50,"max_backups":5,"max_age_days":1,"time":1760373121755,"message":"logging configured"}
+{"level":"fatal","error":"near \")\": syntax error","time":1760373121757,"message":"failed to create tables in our database"}
+{"level":"info","file_logging":true,"json_output":true,"log_directory":"./logs","filename":"shakti.log","max_size_mb":50,"max_backups":5,"max_age_days":1,"time":1760373140644,"message":"logging configured"}
+{"level":"fatal","error":"near \")\": syntax error","time":1760373140646,"message":"failed to create tables in our database"}
+{"level":"info","file_logging":true,"json_output":true,"log_directory":"./logs","filename":"shakti.log","max_size_mb":50,"max_backups":5,"max_age_days":1,"time":1760373473889,"message":"logging configured"}
+{"level":"fatal","error":"near \")\": syntax error","time":1760373473890,"message":"failed to create tables in our database"}
+{"level":"info","file_logging":true,"json_output":true,"log_directory":"./logs","filename":"shakti.log","max_size_mb":50,"max_backups":5,"max_age_days":1,"time":1760373786322,"message":"logging configured"}
+{"level":"fatal","error":"near \")\": syntax error","time":1760373786323,"message":"failed to create tables in our database"}
+{"level":"info","file_logging":true,"json_output":true,"log_directory":"./logs","filename":"shakti.log","max_size_mb":50,"max_backups":5,"max_age_days":1,"time":1760373870882,"message":"logging configured"}
+{"level":"info","time":1760373870885,"message":"database is ready"}
+{"level":"info","zip":"../rules.zip","dest":"/tmp/shakti/rules","time":1760373870885,"message":"starting rule extraction"}
+{"level":"info","time":1760373870997,"message":"rule extraction complete."}
+{"level":"error","error":"undefined identifier \"undefined\"","rule_file":"/tmp/shakti/rules/yes.yar","time":1760373873992,"message":"syntax error in rule file. skipping"}
+{"level":"info","operation_mode":"instant_scan","scan_target":"/home/lakshy/","time":1760373874131,"message":"locked and loaded ready to go!"}

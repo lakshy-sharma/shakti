@@ -180,7 +180,7 @@ func compileRules(rulesDir string) (*yara.Rules, error) {
 	return rules, nil
 }
 
-// saveScanResults writes the collected results to a structured JSON file.
+// Save our scan results into the database.
 func saveScanResults(results []YaraScanResult) error {
 	if len(results) == 0 {
 		logger.Warn().Msg("no scan results to save")
@@ -189,7 +189,7 @@ func saveScanResults(results []YaraScanResult) error {
 
 	// Generate a unique filename based on the current time
 	timestamp := time.Now().Format("20060102_150405")
-	outputFile := filepath.Join(GlobalConfig.OutputDirectory, fmt.Sprintf("results_%s.json", timestamp))
+	outputFile := filepath.Join(GlobalConfig.Paths.WorkDirectory, fmt.Sprintf("results_%s.json", timestamp))
 
 	// Marshals the results struct into pretty-printed JSON
 	data, err := json.MarshalIndent(results, "", "  ")
@@ -215,7 +215,7 @@ func startScan() {
 	}
 
 	// Fetch all files inside the directory and scan them one by one.
-	filepath.WalkDir(GlobalConfig.TargetDirectory, func(path string, d fs.DirEntry, err error) error {
+	filepath.WalkDir(GlobalConfig.Paths.ScanTargetDirectory, func(path string, d fs.DirEntry, err error) error {
 		// Check if path is accessible.
 		if err != nil {
 			logger.Error().Err(err).Str("path", path).Msg("error accessing path")

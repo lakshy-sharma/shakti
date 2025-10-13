@@ -33,4 +33,4 @@ go.work.sum
 
 rules.zip
 workspace/release
-workspace/output
+workspace/database

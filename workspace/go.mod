@@ -4,6 +4,7 @@ go 1.25.0
 
 require (
 	github.com/hillu/go-yara/v4 v4.3.4
+	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/rs/zerolog v1.34.0
 	github.com/spf13/cobra v1.10.1
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1

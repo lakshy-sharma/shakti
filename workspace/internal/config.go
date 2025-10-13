@@ -24,12 +24,16 @@ import (
 )
 
 type Config struct {
-	OperationMode    string        `yaml:"operation_mode"`
-	TargetDirectory  string        `yaml:"target_directory"`
-	OutputDirectory  string        `yaml:"output_directory"`
-	Logging          LoggingConfig `yaml:"logging"`
-	TempDirectory    string        `yaml:"temp_directory"`
-	FilescannerRules RuleConfig    `yaml:"filescanner_rules"`
+	OperationMode string        `yaml:"operation_mode"`
+	Paths         Paths         `yaml:"paths"`
+	Logging       LoggingConfig `yaml:"logging"`
+}
+
+type Paths struct {
+	ScanTargetDirectory string `yaml:"scan_target_directory"`
+	WorkDirectory       string `yaml:"work_directory"`
+	DatabaseDirectory   string `yaml:"database_directory"`
+	RulesFile           string `yaml:"rules_file"`
 }
 
 type RuleConfig struct {

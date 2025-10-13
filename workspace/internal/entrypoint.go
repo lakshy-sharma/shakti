@@ -37,18 +37,21 @@ func Entrypoint(config_path string) {
 	logger = getLogger(GlobalConfig)
 
 	// Setup temp directory for working.
-	if err := os.MkdirAll(GlobalConfig.TempDirectory, 0755); err != nil {
-		logger.Error().Err(err).Msg("failed to setup work directory. change your temp directory")
+	if err := os.MkdirAll(GlobalConfig.Paths.WorkDirectory, 0755); err != nil {
+		logger.Error().Err(err).Str("recommended_action", "change your work directory").Msg("failed to setup work directory.")
 		return
 	}
 
-	if err := os.MkdirAll(GlobalConfig.OutputDirectory, 0755); err != nil {
-		logger.Error().Err(err).Msg("failed to setup output directory. change your output directory")
+	// Setup database
+	if err := os.MkdirAll(GlobalConfig.Paths.DatabaseDirectory, 0755); err != nil {
+		logger.Error().Err(err).Str("recommended_action", "change your db directory").Msg("failed to setup database directory")
 		return
 	}
+	setupDB()
+
 	// Extract and Load the yara rules.
-	rulesDir := filepath.Join(GlobalConfig.TempDirectory, GlobalConfig.FilescannerRules.RulesExtractDir)
-	if err := unzipRules(GlobalConfig.FilescannerRules.RulesZipPath, rulesDir); err != nil {
+	rulesDir := filepath.Join(GlobalConfig.Paths.WorkDirectory, "rules")
+	if err := unzipRules(GlobalConfig.Paths.RulesFile, rulesDir); err != nil {
 		logger.Error().Err(err).Msg("failed to extract scanner rules")
 		return
 	}
@@ -59,7 +62,7 @@ func Entrypoint(config_path string) {
 	}
 
 	// Start the code into designated mode.
-	logger.Info().Str("operation_mode", GlobalConfig.OperationMode).Str("target_directory", GlobalConfig.TargetDirectory).Msg("locked and loaded ready to go!")
+	logger.Info().Str("operation_mode", GlobalConfig.OperationMode).Str("scan_target", GlobalConfig.Paths.ScanTargetDirectory).Msg("locked and loaded ready to go!")
 
 	switch GlobalConfig.OperationMode {
 	case "instant_scan":
