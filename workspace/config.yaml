@@ -1,0 +1,24 @@
+# Allowed options are 'instant_scan' and 'daemon_mode'
+operation_mode: "instant_scan"
+target_directory: "/home/lakshy/"
+temp_directory: "/tmp/shakti"
+output_directory: "./output"
+
+# This section allows you to pass custom path for scanning files.
+# The zip path refers to a zip file containing the scanning rules
+filescanner_rules:
+  zip_path: "../rules.zip"
+  extraction_dir: "rules"
+
+# Logging configuration
+logging:
+  enable_console: True
+  use_json: True
+  enable_file_logging: True
+  log_directory: "./logs"
+  log_filename: "shakti.log"
+  max_size_mb: 50
+  max_age_days: 1
+  max_backups: 5
+  log_level: "info"
+  time_format: "UNIXMS" # Zerolog timeformat
