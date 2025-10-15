@@ -1,11 +1,16 @@
-# Allowed options are 'instant_scan' and 'daemon_mode'
-operation_mode: "instant_scan"
-
-paths:
-  scan_target_directory: "/home/lakshy/"
+# Generic settings used across our module.
+generic_settings:
+  # Allowed modes are instant scan and daemon_mode
+  operation_mode: "instant_scan"
   work_directory: "/tmp/shakti"
-  database_directory: "./database"
-  rules_file: "../rules.zip" # Allows only zip files. Pack your rules into a zip file.
+  db_directory: "./database"
+  db_filename: "shakti.db"
+
+# Scan configurations
+scan_settings:
+  target_directory: "/home/lakshy/"
+  # Allows only zip files. Pack your rules into a zip file.
+  rules_filepath: "../rules.zip"
 
 # Logging configuration
 logging:

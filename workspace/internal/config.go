@@ -24,25 +24,25 @@ import (
 )
 
 type Config struct {
-	OperationMode string        `yaml:"operation_mode"`
-	Paths         Paths         `yaml:"paths"`
-	Logging       LoggingConfig `yaml:"logging"`
+	GenericSettings GenericSettings `yaml:"generic_settings"`
+	ScanSettings    ScanSettings    `yaml:"scan_settings"`
+	Logging         LoggingSettings `yaml:"logging"`
 }
 
-type Paths struct {
-	ScanTargetDirectory string `yaml:"scan_target_directory"`
-	WorkDirectory       string `yaml:"work_directory"`
-	DatabaseDirectory   string `yaml:"database_directory"`
-	RulesFile           string `yaml:"rules_file"`
+type GenericSettings struct {
+	OperationMode string `yaml:"operation_mode"`
+	WorkDirectory string `yaml:"work_directory"`
+	DbDirectory   string `yaml:"db_directory"`
+	DbFilename    string `yaml:"db_filename"`
 }
 
-type RuleConfig struct {
-	RulesZipPath    string `yaml:"zip_path"`
-	RulesExtractDir string `yaml:"extraction_dir"`
+type ScanSettings struct {
+	TargetDirectory string `yaml:"target_directory"`
+	RulesFilepath   string `yaml:"rules_filepath"`
 }
 
 // Configuration for logging
-type LoggingConfig struct {
+type LoggingSettings struct {
 	EnableConsole     bool   `yaml:"enable_console"`
 	UseJSON           bool   `yaml:"use_json"`
 	EnableFileLogging bool   `yaml:"enable_file_logging"`

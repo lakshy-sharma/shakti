@@ -9,22 +9,23 @@ import (
 )
 
 var (
-	DB     *sql.DB
-	dbFile = filepath.Join(GlobalConfig.Paths.DatabaseDirectory, "shakti.db")
+	DB *sql.DB
 )
 
 // Check if database exists on the system and create one if it does not.
 // If DB exists then establish a connection.
 func setupDB() {
+	databasePath := filepath.Join(GlobalConfig.GenericSettings.DbDirectory, GlobalConfig.GenericSettings.DbFilename)
+
 	// Check if database file exists
 	dbExists := false
-	if _, err := os.Stat(dbFile); err == nil {
+	if _, err := os.Stat(databasePath); err == nil {
 		dbExists = true
 		logger.Info().Msg("database already exists")
 	}
 
 	// Open or create the database.
-	db, err := sql.Open("sqlite3", dbFile)
+	db, err := sql.Open("sqlite3", databasePath)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("failed to open database")
 	}
@@ -42,10 +43,10 @@ func setupDB() {
 
 	// Load connection
 	if err := getDBConnection(); err != nil {
-		logger.Error().Err(err).Msg("failed to load database connection")
+		logger.Fatal().Err(err).Msg("failed to load database connection")
 	}
 
-	logger.Info().Msg("database is ready")
+	logger.Info().Str("db_path", databasePath).Msg("database is ready")
 }
 
 func createTables() {
@@ -69,8 +70,9 @@ func createTables() {
 }
 
 func getDBConnection() error {
+	databasePath := filepath.Join(GlobalConfig.GenericSettings.DbDirectory, GlobalConfig.GenericSettings.DbFilename)
 	var err error
-	DB, err = sql.Open("sqlite3", dbFile)
+	DB, err = sql.Open("sqlite3", databasePath)
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to open database")
 		return err

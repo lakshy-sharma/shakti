@@ -18,7 +18,6 @@ package internal
 
 import (
 	"os"
-	"path/filepath"
 
 	"github.com/rs/zerolog/log"
 )
@@ -37,34 +36,22 @@ func Entrypoint(config_path string) {
 	logger = getLogger(GlobalConfig)
 
 	// Setup temp directory for working.
-	if err := os.MkdirAll(GlobalConfig.Paths.WorkDirectory, 0755); err != nil {
+	if err := os.MkdirAll(GlobalConfig.GenericSettings.WorkDirectory, 0755); err != nil {
 		logger.Error().Err(err).Str("recommended_action", "change your work directory").Msg("failed to setup work directory.")
 		return
 	}
 
 	// Setup database
-	if err := os.MkdirAll(GlobalConfig.Paths.DatabaseDirectory, 0755); err != nil {
+	if err := os.MkdirAll(GlobalConfig.GenericSettings.DbDirectory, 0755); err != nil {
 		logger.Error().Err(err).Str("recommended_action", "change your db directory").Msg("failed to setup database directory")
 		return
 	}
 	setupDB()
 
-	// Extract and Load the yara rules.
-	rulesDir := filepath.Join(GlobalConfig.Paths.WorkDirectory, "rules")
-	if err := unzipRules(GlobalConfig.Paths.RulesFile, rulesDir); err != nil {
-		logger.Error().Err(err).Msg("failed to extract scanner rules")
-		return
-	}
-	yaraRules, err = compileRules(rulesDir)
-	if err != nil {
-		logger.Error().Err(err).Msg("failed to load scanner rules")
-		return
-	}
-
 	// Start the code into designated mode.
-	logger.Info().Str("operation_mode", GlobalConfig.OperationMode).Str("scan_target", GlobalConfig.Paths.ScanTargetDirectory).Msg("locked and loaded ready to go!")
+	logger.Info().Str("operation_mode", GlobalConfig.GenericSettings.OperationMode).Str("scan_target", GlobalConfig.ScanSettings.TargetDirectory).Msg("locked and loaded ready to go!")
 
-	switch GlobalConfig.OperationMode {
+	switch GlobalConfig.GenericSettings.OperationMode {
 	case "instant_scan":
 		startScan()
 	case "daemon_mode":
