@@ -8,7 +8,7 @@ generic_settings:
 
 # Scan configurations
 scan_settings:
-  target_directory: "/home/lakshy/"
+  target_directory: "/home/lakshy/Citadel/Library"
   # Allows only zip files. Pack your rules into a zip file.
   rules_filepath: "../rules.zip"
 

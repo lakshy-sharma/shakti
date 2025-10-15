@@ -33,7 +33,6 @@ import (
 	"time"
 
 	"github.com/hillu/go-yara/v4"
-	"github.com/rs/zerolog"
 )
 
 const (
@@ -57,11 +56,9 @@ type YaraScanResult struct {
 }
 
 type YaraScanner struct {
-	rules       *yara.Rules
-	db          *sql.DB
-	logger      *zerolog.Logger
-	scanResults []YaraScanResult
-	timeout     time.Duration
+	rules   *yara.Rules
+	db      *sql.DB
+	timeout time.Duration
 }
 
 type ScanStats struct {
@@ -70,7 +67,7 @@ type ScanStats struct {
 	MatchedFiles int64
 	ErrorFiles   int64
 	SkippedFiles int64
-	Duration     time.Duration
+	DurationSec  int64
 }
 
 // Extracts all rules into designated directory.
@@ -501,7 +498,7 @@ func (s *YaraScanner) ScanDirectory(ctx context.Context, dir string) error {
 	saveWG.Wait()
 
 	// Calculate final stats
-	stats.Duration = time.Since(startTime)
+	stats.DurationSec = int64(time.Since(startTime).Seconds())
 
 	// Log final statistics
 	logger.Info().
@@ -510,7 +507,7 @@ func (s *YaraScanner) ScanDirectory(ctx context.Context, dir string) error {
 		Int64("matched", stats.MatchedFiles).
 		Int64("errors", stats.ErrorFiles).
 		Int64("skipped", stats.SkippedFiles).
-		Dur("duration", stats.Duration).
+		Int64("duration_sec", stats.DurationSec).
 		Msg("directory scan completed")
 
 	// Return walk error if it occurred

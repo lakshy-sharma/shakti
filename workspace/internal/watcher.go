@@ -16,7 +16,8 @@ Copyright © 2025 Lakshy Sharma lakshy.d.sharma@gmail.com
 */
 package internal
 
-// This is the daemon mode scanner which watches for any changes in files.
+// StartDaemon is called when the application needs to be run continously in background.
+// It can monitor the filesystem for any changes and scan new incoming documents for any threats.
 func startDaemon() {
 
 }

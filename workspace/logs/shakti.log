@@ -5629,3 +5629,38 @@
 {"level":"info","rule_added":414,"rules_skipped":1,"time":1760549055433,"message":"compiled rules"}
 {"level":"info","directory":"/home/lakshy/","time":1760549055437,"message":"starting directory scan"}
 {"level":"info","workers":2,"time":1760549055437,"message":"starting scan workers (CPU-friendly mode)"}
+{"level":"info","file_logging":true,"json_output":true,"log_directory":"./logs","filename":"shakti.log","max_size_mb":50,"max_backups":5,"max_age_days":1,"time":1760550038842,"message":"logging configured"}
+{"level":"info","time":1760550038842,"message":"database already exists"}
+{"level":"info","db_path":"database/shakti.db","time":1760550038842,"message":"database is ready"}
+{"level":"info","operation_mode":"instant_scan","scan_target":"/home/lakshy/Citadel/Library","time":1760550038842,"message":"locked and loaded ready to go!"}
+{"level":"info","zip":"../rules.zip","dest":"/tmp/shakti/rules","time":1760550038842,"message":"starting rule extraction"}
+{"level":"info","rule_files":415,"time":1760550038884,"message":"rule extraction complete."}
+{"level":"error","error":"undefined identifier \"undefined\"","rule_file":"/tmp/shakti/rules/yes.yar","time":1760550039068,"message":"syntax error in rule file. skipping"}
+{"level":"info","rule_added":414,"rules_skipped":1,"time":1760550039122,"message":"compiled rules"}
+{"level":"info","directory":"/home/lakshy/Citadel/Library","time":1760550039128,"message":"starting directory scan"}
+{"level":"info","workers":2,"time":1760550039128,"message":"starting scan workers (CPU-friendly mode)"}
+{"level":"info","total_files":143,"scanned":143,"matched":18,"errors":0,"skipped":0,"duration":13034.879073,"time":1760550052163,"message":"directory scan completed"}
+{"level":"info","file_logging":true,"json_output":true,"log_directory":"./logs","filename":"shakti.log","max_size_mb":50,"max_backups":5,"max_age_days":1,"time":1760550217520,"message":"logging configured"}
+{"level":"info","time":1760550217520,"message":"database already exists"}
+{"level":"info","db_path":"database/shakti.db","time":1760550217520,"message":"database is ready"}
+{"level":"info","operation_mode":"instant_scan","scan_target":"/home/lakshy/Citadel/Library","time":1760550217520,"message":"locked and loaded ready to go!"}
+{"level":"info","zip":"../rules.zip","dest":"/tmp/shakti/rules","time":1760550217520,"message":"starting rule extraction"}
+{"level":"info","rule_files":415,"time":1760550217563,"message":"rule extraction complete."}
+{"level":"error","error":"undefined identifier \"undefined\"","rule_file":"/tmp/shakti/rules/yes.yar","time":1760550217754,"message":"syntax error in rule file. skipping"}
+{"level":"info","rule_added":414,"rules_skipped":1,"time":1760550217806,"message":"compiled rules"}
+{"level":"info","directory":"/home/lakshy/Citadel/Library","time":1760550217811,"message":"starting directory scan"}
+{"level":"info","workers":2,"time":1760550217811,"message":"starting scan workers (CPU-friendly mode)"}
+{"level":"info","total_files":143,"scanned":143,"matched":18,"errors":0,"skipped":0,"duration":0.000011,"time":1760550229241,"message":"directory scan completed"}
+{"level":"info","time":1760550229241,"message":"scan completed"}
+{"level":"info","file_logging":true,"json_output":true,"log_directory":"./logs","filename":"shakti.log","max_size_mb":50,"max_backups":5,"max_age_days":1,"time":1760550696313,"message":"logging configured"}
+{"level":"info","time":1760550696313,"message":"database already exists"}
+{"level":"info","db_path":"database/shakti.db","time":1760550696313,"message":"database is ready"}
+{"level":"info","operation_mode":"instant_scan","scan_target":"/home/lakshy/Citadel/Library","time":1760550696313,"message":"locked and loaded ready to go!"}
+{"level":"info","zip":"../rules.zip","dest":"/tmp/shakti/rules","time":1760550696313,"message":"starting rule extraction"}
+{"level":"info","rule_files":415,"time":1760550696354,"message":"rule extraction complete."}
+{"level":"error","error":"undefined identifier \"undefined\"","rule_file":"/tmp/shakti/rules/yes.yar","time":1760550696540,"message":"syntax error in rule file. skipping"}
+{"level":"info","rule_added":414,"rules_skipped":1,"time":1760550696591,"message":"compiled rules"}
+{"level":"info","directory":"/home/lakshy/Citadel/Library","time":1760550696596,"message":"starting directory scan"}
+{"level":"info","workers":2,"time":1760550696596,"message":"starting scan workers (CPU-friendly mode)"}
+{"level":"info","total_files":143,"scanned":143,"matched":18,"errors":0,"skipped":0,"duration":11,"time":1760550708087,"message":"directory scan completed"}
+{"level":"info","time":1760550708087,"message":"scan completed"}

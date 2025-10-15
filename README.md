@@ -23,8 +23,9 @@ The project is a gift from a developer for other developers. I know we all hate 
     2. Build a process scanner
     3. Build a autorun scanner
     4. Achieve cross platform support.
-    5. Add local persistence through sqlite
+    5. Add local persistence through sqlite.
     6. Add automated password management for local system users.
+    7. Add automated lynis like system auditing.
 
 2. **Phase 2: Sync with Remote Server**
     1. Build a Remote server capable of storing data collected.

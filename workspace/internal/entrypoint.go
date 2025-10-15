@@ -55,6 +55,7 @@ func Entrypoint(config_path string) {
 	case "instant_scan":
 		startScan()
 	case "daemon_mode":
+		startScan()
 		startDaemon()
 	}
 }
