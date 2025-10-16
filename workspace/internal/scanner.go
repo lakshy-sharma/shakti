@@ -36,7 +36,8 @@ import (
 )
 
 const (
-	fileBufferSize         = 100
+	scanTimeoutMinutes     = 30
+	bufferSize             = 100
 	dbBatchSize            = 1000
 	yaraScanTimeoutSeconds = 60
 	defaultWorkers         = 2
@@ -448,26 +449,25 @@ func (s *YaraScanner) saveScanResults(results []YaraScanResult) error {
 	return nil
 }
 
-// ScanDirectory scans all files in a directory using YARA rules with concurrency
+// ScanDirectory scans all files in a directory using YARA rules with concurrency.
 func (s *YaraScanner) ScanDirectory(ctx context.Context, dir string) error {
-	startTime := time.Now()
-	stats := &ScanStats{}
-
 	logger.Info().Str("directory", dir).Msg("starting directory scan")
 
-	// Channels for communication
-	fileChan := make(chan fileToScan, fileBufferSize)
-	resultsChan := make(chan YaraScanResult, fileBufferSize)
+	// Setup variables and channels
+	startTime := time.Now()
+	stats := &ScanStats{}
+	fileChan := make(chan fileToScan, bufferSize)
+	resultsChan := make(chan YaraScanResult, bufferSize)
 
 	// WaitGroups for synchronization
 	var scanWG sync.WaitGroup
 	var saveWG sync.WaitGroup
 
-	// Start the results collector (single goroutine to batch DB writes)
+	// Start result collector before we start our scanners.
 	saveWG.Add(1)
 	go s.resultCollector(ctx, resultsChan, &saveWG, stats)
 
-	// Start worker pool for scanning (conservative to avoid CPU overload)
+	// Determine required workers and start scanners.
 	numWorkers := defaultWorkers
 	if maxWorkers := runtime.NumCPU() / 2; maxWorkers > 0 && numWorkers > maxWorkers {
 		numWorkers = maxWorkers
@@ -475,32 +475,26 @@ func (s *YaraScanner) ScanDirectory(ctx context.Context, dir string) error {
 	if numWorkers > maxWorkers {
 		numWorkers = maxWorkers
 	}
-	logger.Info().Int("workers", numWorkers).Msg("starting scan workers (CPU-friendly mode)")
-
+	logger.Info().Int("workers", numWorkers).Msg("starting scan workers")
 	for i := 0; i < numWorkers; i++ {
 		scanWG.Add(1)
 		go s.scanWorker(ctx, fileChan, resultsChan, &scanWG, stats)
 	}
 
-	// Walk the directory and send files to workers
+	// Walk the compleyte directory and send files for scanning into scanners.
 	walkErr := s.walkDirectory(ctx, dir, fileChan, stats)
 
-	// Close the file channel to signal workers to stop
+	// When files are completed simply close the file channel to signal other workers to stop.
+	// Wait for the workers to finish.
 	close(fileChan)
-
-	// Wait for all scan workers to finish
 	scanWG.Wait()
 
-	// Close results channel to signal collector to stop
+	// When scanners are completed then close our result collector.
 	close(resultsChan)
-
-	// Wait for result collector to finish
 	saveWG.Wait()
 
-	// Calculate final stats
+	// Generate scan statistics
 	stats.DurationSec = int64(time.Since(startTime).Seconds())
-
-	// Log final statistics
 	logger.Info().
 		Int64("total_files", stats.TotalFiles).
 		Int64("scanned", stats.ScannedFiles).
@@ -510,15 +504,14 @@ func (s *YaraScanner) ScanDirectory(ctx context.Context, dir string) error {
 		Int64("duration_sec", stats.DurationSec).
 		Msg("directory scan completed")
 
-	// Return walk error if it occurred
+		// Return walk error if it occurred
 	if walkErr != nil {
 		return fmt.Errorf("error walking directory: %w", walkErr)
 	}
-
 	return nil
 }
 
-// This entrypoint starts a full scan of target folder.
+// Startscan is a entrypoint function which generates a new yara scanner and performs a full scan before closing the scan.
 func startScan() {
 	// Create scanner
 	scanner, err := NewYaraScanner(GlobalConfig.ScanSettings.RulesFilepath, filepath.Join(GlobalConfig.GenericSettings.WorkDirectory, "rules"), DB)
@@ -528,11 +521,11 @@ func startScan() {
 	defer scanner.Close()
 
 	// Create context with timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), scanTimeoutMinutes*time.Minute)
 	defer cancel()
+
 	// Scan directory
 	if err := scanner.ScanDirectory(ctx, GlobalConfig.ScanSettings.TargetDirectory); err != nil {
 		logger.Error().Err(err).Msg("scan failed")
 	}
-	logger.Info().Msg("scan completed")
 }

@@ -1,7 +1,7 @@
 # Generic settings used across our module.
 generic_settings:
   # Allowed modes are instant scan and daemon_mode
-  operation_mode: "instant_scan"
+  operation_mode: "daemon_mode"
   work_directory: "/tmp/shakti"
   db_directory: "./database"
   db_filename: "shakti.db"
