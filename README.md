@@ -44,3 +44,6 @@ The project is a gift from a developer for other developers. I know we all hate 
 5. **Phase 5: Add a feature to monitor log files**
     1. Monitor local system log files and scan them for any malicious activities by provided user rules.
     2. Become a full fledged Mitre attack scanner for the filesystem.
+
+6. **Phase 6: Research and Development**
+    1. Develop a data leak detection and stopping system

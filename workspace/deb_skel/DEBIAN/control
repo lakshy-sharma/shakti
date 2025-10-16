@@ -1,0 +1,7 @@
+Package: shakti
+Version: <VERSION>
+Architecture: <ARCH>
+Depends: libyara-dev
+Maintainer: lakshy.d.sharma@gmail.com
+Priority: optional
+Description: Shakti is an EDR tool for monitoring local filesystems and detecting data leaks.

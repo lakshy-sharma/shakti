@@ -5,25 +5,30 @@ SRC=./src
 
 # Deployment variables
 PACKAGE_NAME=shakti
-ARCH=amd64
-VERSION=1.0.0
+VERSION=$(shell cat version)
 DEB_SKEL=./deb_skel
-
-DEB_BASE=./${PACKAGE_NAME}_${VERSION}_${ARCH}.deb
 DEPLOY_BINPATH=${DEB_BASE}/opt/shakti
 
-all: build deploy clean
+all: linux_amd64
 
-build:
+linux_amd64: ARCH :=amd64
+linux_amd64: DEB_BASE := ./$(PACKAGE_NAME)_$(VERSION)_$(ARCH)
+linux_amd64:
+	@echo "Building Shakti - Version: ${VERSION} Architecture: ${ARCH}"
+	@echo "============================================"
 	cd ${SRC} && go build -ldflags="-s -w" -o ${BIN_NAME} main.go
 	mkdir -p ${RELEASE_DIR}
 	mv ${SRC}/${BIN_NAME} ${RELEASE_DIR}/${BIN_NAME}
 	upx --brute ${RELEASE_DIR}/${BIN_NAME}
 
-deploy:
+	@echo "Building shakti debian"
 	cp -r ${DEB_SKEL} ${DEB_BASE}
+	sed -i 's/<VERSION>/${VERSION}/' ${DEB_BASE}/DEBIAN/control
+	sed -i 's/<ARCH>/${ARCH}/' ${DEB_BASE}/DEBIAN/control
 	cp ${RELEASE_DIR}/${BIN_NAME} ${DEPLOY_BINPATH}/${BIN_NAME}
 	dpkg-deb --build ${DEB_BASE}
 
-clean:
+	@echo "Cleaning build files"
 	rm -r ${DEB_BASE}
+	@echo "Build complete"
+	@echo "============================================";
