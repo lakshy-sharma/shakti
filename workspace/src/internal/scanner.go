@@ -382,11 +382,13 @@ func (s *YaraScanner) resultCollector(ctx context.Context, resultsChan <-chan Ya
 				return
 			}
 
-			batch = append(batch, result)
+			// Check if any detections were found before appending to batch.
+			if len(result.Matches) > 0 || result.Error != nil {
+				batch = append(batch, result)
 
-			// Flush if batch is full
-			if len(batch) >= dbBatchSize {
-				flush()
+				if len(batch) >= dbBatchSize {
+					flush()
+				}
 			}
 		case <-ticker.C:
 			// Periodic flush to avoid holding results too long
