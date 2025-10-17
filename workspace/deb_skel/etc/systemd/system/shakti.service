@@ -3,7 +3,7 @@ Description=Shakti EDR service
 After=network.target
 
 [Service]
-Type=notify
+Type=exec
 LimitNOFILE=16384
 Restart=always
 RestartSec=5
